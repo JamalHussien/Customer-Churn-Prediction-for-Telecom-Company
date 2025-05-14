@@ -14,11 +14,6 @@ A comprehensive end-to-end machine learning solution for predicting customer chu
 - [Hyperparameter Tuning](#hyperparameter-tuning)
 - [Model Evaluation](#model-evaluation)
 - [Deployment](#deployment)
-- [Repository Structure](#repository-structure)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Project Overview
 Telecom operators lose significant revenue when customers churn. This project builds a robust churn-prediction system that:
 - Analyzes customer behavior, demographics, and billing history
@@ -27,7 +22,7 @@ Telecom operators lose significant revenue when customers churn. This project bu
 - Optimizes them via `RandomizedSearchCV`
 - Deploys a dark-themed Streamlit app for real-time, single-customer predictions
 
-Data
+## Data
 Input: Customer billing, demographic, and service-usage data
 Target: Binary Churn flag (1 = churned, 0 = stayed)
 
@@ -39,7 +34,7 @@ global_zip_mean.pkl: Fallback churn rate
 
 All custom transformers and preprocessing logic live in preprocessing.py.
 
-Exploratory Data Analysis (EDA)
+## Exploratory Data Analysis (EDA)
 Distribution Analysis
 Heavy right-skew in billing features (Total Charges, Avg Monthly GB Download)
 
@@ -50,7 +45,7 @@ Monthly Charge shows positive correlation with churn
 
 Initial CLV proxy (monthly_charge × tenure) redundant with Total Charges
 
-Science & Technical Approach
+## Science & Technical Approach
 Statistical Transformations
 Apply log1p or Yeo–Johnson transforms to reduce skew
 
@@ -59,9 +54,11 @@ Standard scaling to bring features to comparable variance
 Predictive CLV
 Compute "months remaining in current contract cycle" via:
 
-python
+```python
 remaining = contract_length - (tenure % contract_length)
 CLV = monthly_charge * remaining
+```
+
 Captures forward-looking customer value rather than pure historical spend.
 
 Cross-Validated Target Encoding
@@ -77,7 +74,7 @@ Rare grouping to reduce noise
 Imbalance Correction
 SMOTE oversampling vs. class_weight='balanced' to boost recall on churners
 
-Feature Engineering
+## Feature Engineering
 Imputation
 Offer → "No Offer"
 
@@ -102,9 +99,9 @@ Compute predictive CLV on remaining months
 ZIP-Code Encoding
 Cross-validated target mean encoding for robust ZIP signal
 
-Preprocessing & Pipelines
-Decision Tree & Random Forest
-python
+## Preprocessing & Pipelines
+## Decision Tree & Random Forest
+```python
 ImbPipeline([
   ('impute_offer',     fill_offer_tf),
   ('impute_internet',  fill_internet_tf),
@@ -123,15 +120,15 @@ ImbPipeline([
   ])),
   ('smote',            SMOTE(random_state=42)),
   ('clf',              DecisionTreeClassifier(random_state=42))
-])
+])```
 No numeric scaling
 
 One-Hot + Ordinal encoding
 
 SMOTE for imbalance
 
-Logistic Regression
-python
+## Logistic Regression
+```python
 ImbPipeline([
   ...same initial steps...,
   ('encode_scale', ColumnTransformer([
@@ -140,7 +137,7 @@ ImbPipeline([
       ('ohe',    OneHotEncoder(handle_unknown='ignore'), ohe_feats),
       ('ord',    OrdinalEncoder(categories=ordinal_categories), ordinal_feats),
   ])),
-  ('smote',           SMOTE(random_state=42)),        # optional
+  ('smote',           SMOTE(random_state=42)),       
   ('poly',            PolynomialFeatures(degree=d)),
   ('clf',             LogisticRegression(
                         solver='liblinear', 
@@ -148,23 +145,24 @@ ImbPipeline([
                         class_weight='balanced',
                         max_iter=5000))
 ])
+```
 Log-transform + scaling before polynomial expansion
 
 PolynomialFeatures for interactions
 
 Class weighting or SMOTE
 
-Hyperparameter Tuning
+## Hyperparameter Tuning
 RandomizedSearchCV (30–40 trials, 5-fold CV)
 
-Tree models: max_depth, min_samples_split, min_samples_leaf, max_features, (n_estimators, bootstrap for RF)
+Tree models: max_depth, min_samples_split, min_samples_leaf, max_features, (n_estimators for RF)
 
 Logistic: C, penalty, solver, poly__degree
 
-Scoring: Optimize recall to catch churners, monitor precision & ROC-AUC
+## Model Evaluation
+used accuracy, precision, recall, f beta score -parameter = 2 to give recall a higher advantage- and ROC.
 
-
-Deployment
+## Deployment
 Saved Pipelines in models/ (.joblib)
 Streamlit App (app.py):
 
@@ -174,5 +172,6 @@ Single-customer form, input validation, default injection for missing columns
 
 Displays churn prediction & probability
 
-bash
+```bash
 streamlit run app.py
+```
