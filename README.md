@@ -66,8 +66,6 @@ Out-of-fold mean churn rate per ZIP using KFold, avoiding leakage
 
 Stored as a dict plus global fallback for unseen codes
 
-High-Cardinality Handling
-Frequency or target encoding for "Service_Bundle" with 49 categories
 
 Rare grouping to reduce noise
 
