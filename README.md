@@ -120,7 +120,9 @@ ImbPipeline([
   ])),
   ('smote',            SMOTE(random_state=42)),
   ('clf',              DecisionTreeClassifier(random_state=42))
-])```
+])
+```
+
 No numeric scaling
 
 One-Hot + Ordinal encoding
