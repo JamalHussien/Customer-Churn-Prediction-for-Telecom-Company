@@ -47,7 +47,7 @@ Initial CLV proxy (monthly_charge × tenure) redundant with Total Charges
 
 ## Science & Technical Approach
 Statistical Transformations
-Apply log1p or Yeo–Johnson transforms to reduce skew
+Apply log1p to reduce skew
 
 Standard scaling to bring features to comparable variance
 
